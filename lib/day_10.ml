@@ -36,37 +36,38 @@ let parse input =
 let get_connected_pipes grid (x, y) (dir : direction option) =
   List.fold grid ~init:[] ~f:(fun connected (loc', pipe') ->
     let eq = Poly.equal in
-    let result = match dir, loc' with
-    | (None | Some North), (x', y') when y = y' && x = x' + 1 ->
-      (match pipe' with
-       | Visible (l, r) when eq l South -> (Some r, Some (loc', pipe'))
-       | Visible (l, r) when eq r South -> (Some l, Some (loc', pipe'))
-       | Start -> (None, Some (loc', pipe'))
-       | _ -> (None, None))
-    | (None | Some East), (x', y') when x = x' && y = y' - 1 ->
-      (match pipe' with
-       | Visible (l, r) when eq l West -> (Some r, Some (loc', pipe'))
-       | Visible (l, r) when eq r West -> (Some l, Some (loc', pipe'))
-       | Start -> (None, Some (loc', pipe'))
-       | _ -> (None, None))
-    | (None | Some South), (x', y') when y = y' && x = x' - 1 ->
-      (match pipe' with
-       | Visible (l, r) when eq l North -> (Some r, Some (loc', pipe'))
-       | Visible (l, r) when eq r North -> (Some l, Some (loc', pipe'))
-       | Start -> (None, Some (loc', pipe'))
-       | _ -> (None, None))
-    | (None | Some West), (x', y') when x = x' && y = y' + 1 ->
-      (match pipe' with
-       | Visible (l, r) when eq l East -> (Some r, Some (loc', pipe'))
-       | Visible (l, r) when eq r East -> (Some l, Some (loc', pipe'))
-       | Start -> (None, Some (loc', pipe'))
-       | _ -> (None, None))
-    | _ -> (None, None) in
+    let result =
+      match dir, loc' with
+      | (None | Some North), (x', y') when y = y' && x = x' + 1 ->
+        (match pipe' with
+         | Visible (l, r) when eq l South -> Some r, Some (loc', pipe')
+         | Visible (l, r) when eq r South -> Some l, Some (loc', pipe')
+         | Start -> None, Some (loc', pipe')
+         | _ -> None, None)
+      | (None | Some East), (x', y') when x = x' && y = y' - 1 ->
+        (match pipe' with
+         | Visible (l, r) when eq l West -> Some r, Some (loc', pipe')
+         | Visible (l, r) when eq r West -> Some l, Some (loc', pipe')
+         | Start -> None, Some (loc', pipe')
+         | _ -> None, None)
+      | (None | Some South), (x', y') when y = y' && x = x' - 1 ->
+        (match pipe' with
+         | Visible (l, r) when eq l North -> Some r, Some (loc', pipe')
+         | Visible (l, r) when eq r North -> Some l, Some (loc', pipe')
+         | Start -> None, Some (loc', pipe')
+         | _ -> None, None)
+      | (None | Some West), (x', y') when x = x' && y = y' + 1 ->
+        (match pipe' with
+         | Visible (l, r) when eq l East -> Some r, Some (loc', pipe')
+         | Visible (l, r) when eq r East -> Some l, Some (loc', pipe')
+         | Start -> None, Some (loc', pipe')
+         | _ -> None, None)
+      | _ -> None, None
+    in
     match result with
     | Some dir, Some loc -> (Some dir, loc) :: connected
     | None, Some loc -> (None, loc) :: connected
-    | _ -> connected
-
+    | _ -> connected)
 ;;
 
 let rec traverse ?(route = []) grid (loc, pipe) dir =
