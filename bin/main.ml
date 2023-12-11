@@ -27,6 +27,7 @@ let () =
     | 8 -> Aoc2023.Day_08.(part1, part2)
     | 9 -> Aoc2023.Day_09.(part1, part2)
     | 10 -> Aoc2023.Day_10.(part1, part2)
+    | 11 -> Aoc2023.Day_11.(part1, part2)
     | _ -> raise (Invalid_day "Invalid day given")
   in
   let open Stdio in
