@@ -1,3 +1,4 @@
 (library
  (name aoc2023)
- (libraries base stdio re dum))
+ (preprocess (pps ppx_jane))
+ (libraries base stdio re dum ppx_jane))

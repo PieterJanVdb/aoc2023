@@ -1,4 +1,5 @@
 (executable
  (public_name aoc2023)
  (name main)
- (libraries aoc2023 base stdio re dum))
+ (preprocess (pps ppx_jane))
+ (libraries aoc2023 base stdio re dum ppx_jane))
