@@ -19,7 +19,7 @@ let parse input =
       | _ -> Empty))
 ;;
 
-let rec tilt (platform : platform) =
+let rec tilt platform =
   let rec move platform =
     match platform with
     | [] -> false, []
@@ -56,7 +56,7 @@ let cycle platform =
 
 let platform_eq a b = List.equal Poly.( = ) (List.concat a) (List.concat b)
 
-let find_loop_len (platforms : platform list) =
+let find_loop_len platforms =
   let rec loop pow lam x xs =
     match xs with
     | [] -> None
@@ -72,7 +72,7 @@ let find_loop_len (platforms : platform list) =
   | _ -> None
 ;;
 
-let find_loop (platforms : platform list) =
+let find_loop platforms =
   match find_loop_len platforms with
   | Some len ->
     let idx =
