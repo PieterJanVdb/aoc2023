@@ -1,20 +1,32 @@
 open Base
 
-let hash str =
-  let chars = String.to_list str in
-  List.fold chars ~init:0 ~f:(fun n c ->
-    if Char.(c <> '\n') then (Char.to_int c + n) * 17 % 256 else n)
-;;
+module BoxKey = struct
+  module T = struct
+    type t = string
+
+    let hash x =
+      let chars = String.to_list x in
+      List.fold chars ~init:0 ~f:(fun n c ->
+        if Char.(c <> '\n') then (Char.to_int c + n) * 17 % 256 else n)
+    ;;
+
+    let compare x y = Int.compare (hash x) (hash y)
+    let sexp_of_t x = Int.sexp_of_t (hash x)
+  end
+
+  include T
+  include Comparable.Make (T)
+end
 
 let part1 input =
   input
   |> String.split ~on:','
-  |> List.fold ~init:0 ~f:(fun sum str -> sum + hash str)
+  |> List.fold ~init:0 ~f:(fun sum str -> sum + BoxKey.hash str)
   |> Int.to_string
 ;;
 
 let part2 input =
-  let boxes = Hashtbl.create (module Int) in
+  let boxes = Hashtbl.create (module BoxKey) in
   let () =
     input
     |> String.split ~on:','
@@ -24,8 +36,7 @@ let part2 input =
         | [ label; focal ] -> label, Some (Int.of_string (String.strip focal))
         | _ -> String.drop_suffix instruction 1, None
       in
-      let box = hash label in
-      let line = Hashtbl.find_or_add boxes box ~default:(fun _ -> []) in
+      let line = Hashtbl.find_or_add boxes label ~default:(fun _ -> []) in
       let new_line =
         match focal with
         | Some focal ->
@@ -36,12 +47,12 @@ let part2 input =
           else (label, focal) :: line
         | None -> List.Assoc.remove line ~equal:String.equal label
       in
-      Hashtbl.set boxes ~key:box ~data:new_line)
+      Hashtbl.set boxes ~key:label ~data:new_line)
   in
   Hashtbl.fold boxes ~init:0 ~f:(fun ~key ~data sum ->
     let focusing_powers =
       List.foldi (List.rev data) ~init:0 ~f:(fun idx sum (_, focal) ->
-        sum + ((key + 1) * (idx + 1) * focal))
+        sum + ((BoxKey.hash key + 1) * (idx + 1) * focal))
     in
     sum + focusing_powers)
   |> Int.to_string
